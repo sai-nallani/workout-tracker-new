@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Add a New Set{% endblock %}
+{% block content %}
+<form id="form" autocomplete="off">
+    <div style="width: 40%;" class="form-group">
+        <label for="exercise">Type</label>
+        <select class="form-control" id="type" name="type">
+            <option id="delthis">--SELECT TYPE--</option>
+            <option value="Push">Push</option>
+            <option value="Pull">Pull</option>
+            <option value="Legs">Legs</option>
+            <option value="Other">Other</option>
+        </select>
+        <div id="repsAndWeight">
+            <label for="">Exercise</label>
+            <select value='' name="exercise" id="exercise" class="form-control">
+            </select>
+            <label for="reps">Reps:</label>
+            <input pattern="[0-9]*" class="form-control" type="number" name="reps" id="reps" min="1" max="1000">
+            <label for="weight">Weight:</label>
+            <input pattern="[0-9]*" class="form-control" type="number" name="weight" id="weight" min="1" max="500">
+            <button style='margin: 1em 0;' type="submit" class="btn btn-primary">Add Set</button>
+            <a id="eStats" href="{{ url_for('views.view_by_exercise') }}">View Exercise Stats</a>
+        </div>
+    </div>
+    <div style="display: inline-block" id="todaySets">
+    </div>
+</form>
+{% endblock %}
+
+{% block javascript %}
+    <script type="module" src="{{ url_for('static', filename='js/addNewSet.js') }}"></script>
+
+{% endblock %}

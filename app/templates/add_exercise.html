@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Add New Exercise{% endblock %}
+{% block content %}
+    <form autocomplete="off" method="POST">
+        <label for="adsf">Choose Type:</label>
+        <select class="form-select" name="type" id="type">
+            <option value="Push">
+                Push
+            </option>
+            <option value="Pull">
+                Pull
+            </option>
+            <option value="Legs">
+                Legs
+            </option>
+            <option value="Other">
+                Other
+            </option>
+        </select>
+        <br>
+        <input class="form-control-sm" name="exercise" id="exercise">
+        <button type="submit" class="btn btn-primary">Add Exercise</button>
+    </form>
+{% endblock %}

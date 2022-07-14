@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Sets{% endblock %}
+{% block content %}
+{% for exercise in data %}
+{% if exercise != 'Type' %}
+<h2>{{exercise}}
+    <button class="btn btn-secondary btn-sm" onclick="hide('{{exercise}}')">Show/Hide</button>
+    <a style="display: inline;" class="btn btn-success btn-sm" onclick="addNewSet('{{exercise}}')">
+        <span>Add a set</span>
+    </a>
+</h2>
+<div style='display: block;' id="{{exercise}}">
+    {% for i in data[exercise] %}
+    <div>
+        <p class="fs-5">
+            <button style="display: inline;" class="btn btn-danger btn-sm"
+                onclick="delete_set('{{date}}', '{{exercise}}', '{{data[exercise].index(i)}}')"><span>&times;</span>
+            </button>
+
+            Reps: {{i[0]}} | Weight: {{i[1]}}
+        </p>
+
+    </div>
+    {% endfor %}
+</div>
+{% block javascript %}
+<script>
+    function delete_set(date, i, id) {
+        fetch("/delete_set", {
+            method: "POST",
+            body: `${date},${i},${id}`
+        }).then((_res) => {
+            window.location.reload();
+        });
+    
+    }
+    try {
+        let canRedirect = false;
+        let workoutData;
+    } catch (e) {
+        canRedirect = false;
+    }
+    function setCookie(name, value, options = {}) {
+
+        options = {
+            path: '/',
+            // add other defaults here if necessary
+            ...options
+        };
+
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+        for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    }
+
+    fetch('/get_data').then(res => {
+        res.json().then(data => {
+            workoutData = data;
+            canRedirect = true;
+        });
+    });
+    function addNewSet(exercise) {
+        if (!canRedirect) {
+            return null;
+        } else {
+            for (let [type, exercises] of Object.entries(workoutData)) {
+                if (exercises.indexOf(exercise) != -1) {
+                    let inputJSON = {
+                        exerciseType: type,
+                        exercise: exercise,
+                        reps: 0,
+                        weight: 0
+                    };
+                    setCookie('previousSubmission', JSON.stringify(inputJSON));
+                    window.location.href = "{{url_for('views.add_new_set')}}";
+                    break;
+                }
+            }
+
+        }
+
+    }
+</script>
+{% endblock %}
+{% endif %}
+{% endfor %}
+{% endblock %}

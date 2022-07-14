@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}View Exercise Stats{% endblock %}
+{% block content %}
+<form autocomplete="off" id="form">
+    <div class="form-group">
+        <label for="type">Type</label>
+        <select class="form-control" id="type" name="type">
+            <option id="delthis">--SELECT TYPE--</option>
+            <option value="Push">Push</option>
+            <option value="Pull">Pull</option>
+            <option value="Legs">Legs</option>
+            <option value="Other">Other</option>
+        </select>
+        <label for="exercise">Exercise</label>
+        <select name="exercise" id="exercise" class="form-control">
+        </select>
+    </div>
+    <button class='btn btn-primary' type="submit">Next</button>
+</form>
+<button id="../asi" hidden></button>
+<div id="exerciseInfo" hidden>
+</div>
+<div id='1rmcalc' hidden style="width: 50%;">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane"
+                type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Get 1RM</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane"
+                type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Get XRM</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div style="width:fit-content;" class="tab-pane fade show active" id="home-tab-pane" role="tabpanel"
+            aria-labelledby="home-tab" tabindex="0">
+            <div class="idk form-control">
+                <input class="form-control" type="number" id="weight" placeholder="Enter Weight">
+                <input class="form-control" type="number" id="reps1" placeholder="Enter Reps">
+                <input class="form-control" placeholder='One Rep Max' type="number" id='ans1' disabled>
+                <button class='btn btn-primary' onclick="get1rm()">Get 1RM</button>
+            </div>
+        </div>
+        <div style="width:fit-content;" class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
+            aria-labelledby="profile-tab" tabindex="0">
+            <div class="idk form-control">
+                <input value="" class="form-control" type="number" id="1rm"
+                    placeholder="Enter 1RM">
+                <input class="form-control" type="number" id="reps" placeholder="Enter Reps">
+                <input class="form-control" placeholder='X Rep Max' type="number" id='ans2' disabled>
+                <button class='btn btn-primary' onclick="getqrm()">Get XRM</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+<script defer src="{{ url_for('static', filename='js/viewByExercise.js') }}"></script>
+<script>
+    {% if fromAddSet %}
+    document.getElementById('type').value = {{et}};
+    document.getElementById('exercise').value = {{e}};
+    document.getElementById('../asi').click();
+    {% endif %}
+</script>
+{% endblock %}
