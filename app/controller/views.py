@@ -7,8 +7,7 @@ import json
 from datetime import datetime
 import random
 
-THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-my_file = os.path.join(THIS_FOLDER, 'website/workouts.json')
+
 
 views: Blueprint = Blueprint('views', __name__)
 
