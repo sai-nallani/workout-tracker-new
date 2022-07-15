@@ -43,9 +43,7 @@ def view_date():
 def add_new_set():
     if request.method == 'POST':
         post_data: dict = json.loads(request.data)
-        timestamp = post_data['datetime']
-        datetimeObj: datetime = datetime.fromtimestamp(timestamp/1000)
-        date: str = str(datetimeObj.date())
+        date: str = post_data['date']
         exercise: str = post_data['exercise']
         reps: int = int(post_data['reps'])
         weight: int = int(post_data['weight'])

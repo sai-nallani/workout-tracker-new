@@ -124,13 +124,20 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             setCookie(lastSetCookieName, "", {
                 'max-age': -1
             });
+            let addZeroIfLessThanTen = (value) => {
+                return value < 10 ? '0' + value.toString() : value.toString();
+            };
+            let date = `${new Date().getFullYear()}-${addZeroIfLessThanTen(date.getMonth())}-${addZeroIfLessThanTen(date.getDate)}`;
+            
             let formJSON = {
                 exerciseType: form.elements['type'].value,
                 exercise: form.elements['exercise'].value,
                 reps: form.elements['reps'].value,
                 weight: form.elements['weight'].value,
-                datetime: new Date().getTime()
+                datetime: new Date().getTime(), 
+                date: date
             };
+
             setCookie(lastSetCookieName, JSON.stringify(formJSON));
 
             // #region timestamp exercise
