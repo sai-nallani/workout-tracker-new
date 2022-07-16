@@ -79,10 +79,8 @@ ${addZeroIfLessThanTen(date.getDate())}`;
                 }
             } catch (e) {
                 if (e instanceof TypeError) {
-                    console.log(e);
                     return null; // exercisedoesntexistincookie
                 } else if (e instanceof SyntaxError) {
-                    console.log(e);
                     return null; // cookienotfound
                 }
             }
@@ -127,7 +125,7 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             let addZeroIfLessThanTen = (value) => {
                 return value < 10 ? '0' + value.toString() : value.toString();
             };
-            let date = `${new Date().getFullYear()}-${addZeroIfLessThanTen(date.getMonth())}-${addZeroIfLessThanTen(date.getDate)}`;
+            let dateStr = `${new Date().getFullYear()}-${addZeroIfLessThanTen(new Date().getMonth())}-${addZeroIfLessThanTen(new Date().getDate())}`;
             
             let formJSON = {
                 exerciseType: form.elements['type'].value,
@@ -135,7 +133,7 @@ ${addZeroIfLessThanTen(date.getDate())}`;
                 reps: form.elements['reps'].value,
                 weight: form.elements['weight'].value,
                 datetime: new Date().getTime(), 
-                date: date
+                date: dateStr
             };
 
             setCookie(lastSetCookieName, JSON.stringify(formJSON));
@@ -151,7 +149,6 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             if (exerciseTimestamps) {
                 let newTimestamps = JSON.parse(exerciseTimestamps);
                 newTimestamps.push(formJSON.datetime);
-                console.log(newTimestamps);
                 setCookie(exerciseWithNoSpace,
                     JSON.stringify(newTimestamps),
                     {

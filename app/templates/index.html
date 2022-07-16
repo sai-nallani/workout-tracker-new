@@ -8,15 +8,21 @@
 {% block content %}
 <br>
 <div class="list-group">
+  {% if workouts %}
   {% for date in workouts %}
   <a href="{{url_for('views.view_date', date=date)}}" class="list-group-item list-group-item-action">Workout on
     {{date}}</a>
   <br>
   {% endfor %}
+  {% else %}
+  <h1>Wow! There are no workouts. Grind more</h1>
+  {% endif %}
 </div>
 {% endblock %}
 {% block javascript %}
 <script>
-  
+  if (location.href.indexOf('?') == -1) {
+    location.href = `/?q=${Math.random()}`;
+  }
 </script>
 {% endblock %}

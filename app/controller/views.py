@@ -23,7 +23,6 @@ def get_data():
 def index():
     data = update_json()
     workouts: list = list(data['workouts'].keys())[::-1]
-    print("asdfasdf", workouts)
     return render_template('index.html', workouts=workouts)
 
 
