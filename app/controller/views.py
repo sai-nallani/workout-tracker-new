@@ -1,12 +1,11 @@
+import re
 from typing import List
 from flask import Blueprint, jsonify, url_for, flash, render_template, request, redirect
 from datetime import datetime
 from app.utils import update_json
-import os
 import json
 from datetime import datetime
 import random
-
 
 
 views: Blueprint = Blueprint('views', __name__)
@@ -45,7 +44,7 @@ def add_new_set():
         exercise: str = post_data['exercise']
         reps: int = int(post_data['reps'])
         weight: int = int(post_data['weight'])
-
+        print(date, exercise, reps, weight)
         if date in data['workouts']:
             if exercise in data["workouts"][date]:
                 data["workouts"][date][exercise].append([reps, weight])

@@ -45,7 +45,7 @@ fetch('/get_data').then((r) => {
         let form = document.querySelector("#form");
         let todaySets = document.querySelector('#todaySets');
         // #endregion
-
+        let URIExercise = s => s.replaceAll(" ", "");
         // #region functions
         let returnTodayDate = () => {
             let date = new Date();
@@ -59,13 +59,14 @@ ${addZeroIfLessThanTen(date.getDate())}`;
         };
         let updateTodaySets = () => {
             todaySets.innerHTML = "";
-            let exerciseCookies = getCookie(exercise.value.replaceAll(" ", ""));
+            let e = exercise.value
+            let exerciseCookies = getCookie(URIExercise(e));
             if (!exerciseCookies) {
                 return null;
             }
             try {
                 let exerciseTS = JSON.parse(exerciseCookies);
-                let setsToday = workouts_data['workouts'][returnTodayDate()][exercise.value];
+                let setsToday = workouts_data['workouts'][returnTodayDate()][e];
                 for (let i = exerciseTS.length - 1; i >= 0; i--) {
                     let set = setsToday[i];
                     let exerciseTimestamp = exerciseTS[i];
@@ -79,8 +80,10 @@ ${addZeroIfLessThanTen(date.getDate())}`;
                 }
             } catch (e) {
                 if (e instanceof TypeError) {
-                    return null; // exercisedoesntexistincookie
+                    // console.log(e);     
+                    return null; // exercise not in today's cookie, makes sense.
                 } else if (e instanceof SyntaxError) {
+                    // console.log(e);
                     return null; // cookienotfound
                 }
             }
@@ -97,6 +100,7 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             updateTodaySets();
             repsAndWeightDiv.style.display = "block";
         }
+        // #region clear cookies if exercise is deleted
         // #endregion
         exercise_type.addEventListener('change', changeExerciseSelect);
         exercise.addEventListener('change', updateTodaySets);
@@ -125,7 +129,8 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             let addZeroIfLessThanTen = (value) => {
                 return value < 10 ? '0' + value.toString() : value.toString();
             };
-            let dateStr = `${new Date().getFullYear()}-${addZeroIfLessThanTen(new Date().getMonth())}-${addZeroIfLessThanTen(new Date().getDate())}`;
+            let date = new Date();
+            let dateStr = `${date.getFullYear()}-${addZeroIfLessThanTen(date.getMonth() + 1)}-${addZeroIfLessThanTen(date.getDate())}`;
             
             let formJSON = {
                 exerciseType: form.elements['type'].value,
@@ -136,26 +141,28 @@ ${addZeroIfLessThanTen(date.getDate())}`;
                 date: dateStr
             };
 
+            // console.log(formJSON);
             setCookie(lastSetCookieName, JSON.stringify(formJSON));
 
+            let ex = formJSON.exercise;
             // #region timestamp exercise
-            let exerciseWithNoSpace = formJSON.exercise.replaceAll(" ", "");
-            let exerciseTimestamps = getCookie(exerciseWithNoSpace);
-
+            let exerciseTimestamps = getCookie(URIExercise(ex));
+            console.log("line 153", URIExercise(ex));
             let expireDate = new Date();
             expireDate.setHours(24);
             expireDate.setMinutes(0);
             expireDate.setSeconds(0);
             if (exerciseTimestamps) {
                 let newTimestamps = JSON.parse(exerciseTimestamps);
+                console.log("YEAH", newTimestamps);
                 newTimestamps.push(formJSON.datetime);
-                setCookie(exerciseWithNoSpace,
+                setCookie(URIExercise(ex),
                     JSON.stringify(newTimestamps),
                     {
                         'expires': expireDate
                     });
             } else {
-                setCookie(exerciseWithNoSpace,
+                setCookie(URIExercise(ex),
                     JSON.stringify([formJSON.datetime]),
                     {
                         'expires': expireDate
@@ -172,7 +179,7 @@ ${addZeroIfLessThanTen(date.getDate())}`;
                 if (_res.ok) {
                     location.reload();
                 } else {
-                    console.log("error");
+                    console.error("POST REQUEST NOT OK");
                 }
             });
 
