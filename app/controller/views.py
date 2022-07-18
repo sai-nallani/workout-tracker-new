@@ -1,4 +1,5 @@
 import re
+from turtle import update
 from typing import List
 from flask import Blueprint, jsonify, url_for, flash, render_template, request, redirect
 from datetime import datetime
@@ -38,13 +39,14 @@ def view_date():
 
 @views.route('/add_new_set', methods=['GET', 'POST'])
 def add_new_set():
+    data = update_json()
     if request.method == 'POST':
         post_data: dict = json.loads(request.data)
         date: str = post_data['date']
         exercise: str = post_data['exercise']
         reps: int = int(post_data['reps'])
         weight: int = int(post_data['weight'])
-        print(date, exercise, reps, weight)
+        # print(date, exercise, reps, weight)
         if date in data['workouts']:
             if exercise in data["workouts"][date]:
                 data["workouts"][date][exercise].append([reps, weight])
@@ -77,7 +79,7 @@ def delete_set():
     data = update_json()
     date, e, i = str(request.data)[2:-1].split(',')
     del data['workouts'][date][e][int(i)]
-    print(data['workouts'][date][e])
+    # print(data['workouts'][date][e])
     if len(data['workouts'][date][e]) == 0:
         del data['workouts'][date][e]
     del_date = True
@@ -86,5 +88,13 @@ def delete_set():
             del_date = False
     if del_date:
         del data['workouts'][date]
+    data = update_json(data)
+    return jsonify({})
+
+@views.route('/add_new_exercise', methods=['POST'])
+def add_new_exercise():
+    req_data = json.loads(request.get_data())
+    data = update_json()
+    data['exercises'][req_data['type']].append(req_data['exercise'])
     update_json(data)
     return jsonify({})

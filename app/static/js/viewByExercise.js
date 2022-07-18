@@ -4,7 +4,7 @@ let exerciseTypeSelect = document.querySelector('#type');
 let exerciseSelect = document.querySelector('#exercise');
 let workouts_data;
 let changeExerciseSelect = () => {
-    let exercises = workouts_data[exerciseTypeSelect.value];
+    let exercises = workouts_data['exercises'][exerciseTypeSelect.value];
     exerciseSelect.innerHTML = "";
     for (let e of exercises) {
         let optionElement = document.createElement('option');
@@ -25,6 +25,11 @@ let changeExerciseSelect = () => {
 fetch('/get_data').then((r) => {
     r.json().then(data => {
         workouts_data = data;
+        for (let [type, _value] of Object.entries(workouts_data['exercises'])) {
+            let typeElement = document.createElement('option');
+            typeElement.appendChild(document.createTextNode(type));
+            exerciseTypeSelect.appendChild(typeElement);
+        }
         exerciseTypeSelect.addEventListener('change', changeExerciseSelect);
         exerciseSelect.addEventListener('change', loadExerciseData);
     });
@@ -96,26 +101,30 @@ function loadExerciseData() {
             e.appendChild(document.createTextNode(text));
             parentNode.appendChild(e);
             parentNode.appendChild(document.createElement('hr'));
+            return e;
         }
-
-        createElementWithStr('h3',
+        let dLink;
+        let mwsh3 = createElementWithStr('h3',
             `Most Weight Set: ${info.mostWeight.w} lbs, 
 ${info.mostWeight.r} reps, 
-${info.mostWeight.rm1} one rep max
-on ${info.mostWeight.d}`,
+${info.mostWeight.rm1} 1RM `,
             infoDiv);
-        createElementWithStr('h3',
+        dLink = createElementWithStr('a', `(${info.mostWeight.d})`, mwsh3); dLink.href = 'view_date?date=' + info.mostWeight.d;
+
+        let mrsh3 = createElementWithStr('h3',
             `Most Reps Set: ${info.mostReps.w} lbs, 
 ${info.mostReps.r} reps, 
-${info.mostReps.rm1} one rep max
-on ${info.mostReps.d}`,
+${info.mostReps.rm1} 1RM `,
             infoDiv);
-        createElementWithStr('h3',
+        dLink = createElementWithStr('a', `(${info.mostReps.d})`, mrsh3); dLink.href = 'view_date?date=' + info.mostReps.d;
+
+        let brmh3 = createElementWithStr('h3',
             `Best 1RM set: ${info.best1RM.w} lbs, 
 ${info.best1RM.r} reps, 
-${info.best1RM.rm1} one rep max
-on ${info.best1RM.d}`,
+${info.best1RM.rm1} 1RM `,
             infoDiv);
+        dLink = createElementWithStr('a', `(${info.best1RM.d})`, brmh3); dLink.href = 'view_date?date=' + info.best1RM.d;
+
         createElementWithStr('h3', `${info.setsCount} sets total`, infoDiv);
 
     }

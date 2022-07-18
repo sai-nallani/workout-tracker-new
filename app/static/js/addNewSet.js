@@ -30,13 +30,27 @@ function setCookie(name, value, options = {}) {
     document.cookie = updatedCookie;
 }
 
-let workouts_data;
+let addEForm = document.getElementById('addE')
+addEForm.addEventListener('submit', e => {
+    e.preventDefault();
+    let t = addEForm.elements['t'].value;
+    let es = addEForm.elements['newExercise'].value;
+
+    if (confirm('You sure you want to add ' + es + ' to the section of ' + t + '?')) {
+        fetch('/add_new_exercise', {
+            method: 'POST',
+            body: JSON.stringify({ type: t, exercise: es })
+        });
+        location.reload();
+    }
+});
+
 fetch('/get_data').then((r) => {
     r.json().then(data => {
-        workouts_data = data;
+        let workouts_data = data;
         // #region vars
         let lastSetCookieName = 'previousSubmission';
-        let exercise_type = document.querySelector('#type');
+        let exercise_type = document.querySelectorAll('.type');
         let exercise = document.querySelector('#exercise');
         let repsAndWeightDiv = document.querySelector('#repsAndWeight')
         let reps = document.querySelector('#reps');
@@ -46,6 +60,15 @@ fetch('/get_data').then((r) => {
         let todaySets = document.querySelector('#todaySets');
         // #endregion
         let URIExercise = s => s.replaceAll(" ", "");
+
+        // #region setTheTypes
+        for (let [type, _value] of Object.entries(workouts_data['exercises'])) {
+            let typeElement = document.createElement('option');
+            typeElement.appendChild(document.createTextNode(type));
+            exercise_type[0].appendChild(typeElement.cloneNode(true));
+            exercise_type[1].appendChild(typeElement.cloneNode(true));
+        }
+        //#endregion
         // #region functions
         let returnTodayDate = () => {
             let date = new Date();
@@ -57,6 +80,7 @@ ${addZeroIfLessThanTen(date.getMonth() + 1)}-\
 ${addZeroIfLessThanTen(date.getDate())}`;
             return dateStr;
         };
+
         let updateTodaySets = () => {
             todaySets.innerHTML = "";
             let e = exercise.value
@@ -64,7 +88,19 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             if (!exerciseCookies) {
                 return null;
             }
+
+            if (returnTodayDate() in workouts_data['workouts']) {
+                if (workouts_data['workouts'][returnTodayDate()][exercise.value].length == 0) {
+                    setCookie(URIExercise(exercise.value), '', {
+                        'max-age': -1
+                    });
+                }
+            } else {
+                document.cookie.split(";").forEach(function (c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+                return null;
+            }
             try {
+
                 let exerciseTS = JSON.parse(exerciseCookies);
                 let setsToday = workouts_data['workouts'][returnTodayDate()][e];
                 for (let i = exerciseTS.length - 1; i >= 0; i--) {
@@ -90,8 +126,9 @@ ${addZeroIfLessThanTen(date.getDate())}`;
         }
         let changeExerciseSelect = () => {
             reps.style.display = "block";
+            exercise_type[1].value = exercise_type[0].value;
             exercise.innerHTML = "";
-            let exercises = workouts_data[exercise_type.value];
+            let exercises = workouts_data['exercises'][exercise_type[0].value];
             for (let e of exercises) {
                 let optionElement = document.createElement('option');
                 optionElement.appendChild(document.createTextNode(e));
@@ -102,12 +139,12 @@ ${addZeroIfLessThanTen(date.getDate())}`;
         }
         // #region clear cookies if exercise is deleted
         // #endregion
-        exercise_type.addEventListener('change', changeExerciseSelect);
+        exercise_type[0].addEventListener('change', changeExerciseSelect);
         exercise.addEventListener('change', updateTodaySets);
 
         // #region cookie handling
         if (previousSubmissionJSON) {
-            exercise_type.value = previousSubmissionJSON['exerciseType'];
+            exercise_type[0].value = previousSubmissionJSON['exerciseType'];
             reps.value = previousSubmissionJSON['reps'];
             weight.value = previousSubmissionJSON['weight'];
             changeExerciseSelect();
@@ -131,13 +168,13 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             };
             let date = new Date();
             let dateStr = `${date.getFullYear()}-${addZeroIfLessThanTen(date.getMonth() + 1)}-${addZeroIfLessThanTen(date.getDate())}`;
-            
+
             let formJSON = {
                 exerciseType: form.elements['type'].value,
                 exercise: form.elements['exercise'].value,
                 reps: form.elements['reps'].value,
                 weight: form.elements['weight'].value,
-                datetime: new Date().getTime(), 
+                datetime: new Date().getTime(),
                 date: dateStr
             };
 
@@ -147,14 +184,12 @@ ${addZeroIfLessThanTen(date.getDate())}`;
             let ex = formJSON.exercise;
             // #region timestamp exercise
             let exerciseTimestamps = getCookie(URIExercise(ex));
-            console.log("line 153", URIExercise(ex));
             let expireDate = new Date();
             expireDate.setHours(24);
             expireDate.setMinutes(0);
             expireDate.setSeconds(0);
             if (exerciseTimestamps) {
                 let newTimestamps = JSON.parse(exerciseTimestamps);
-                console.log("YEAH", newTimestamps);
                 newTimestamps.push(formJSON.datetime);
                 setCookie(URIExercise(ex),
                     JSON.stringify(newTimestamps),

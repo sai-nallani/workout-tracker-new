@@ -4,8 +4,8 @@
 {% for exercise in data %}
 {% if exercise != 'Type' %}
 <h2>{{exercise}}
-    <button class="btn btn-secondary btn-sm" onclick="hide('{{exercise}}')">Show/Hide</button>
-    <a style="display: inline;" class="btn btn-success btn-sm" onclick="addNewSet('{{exercise}}')">
+    <!-- <button class="btn btn-secondary btn-sm" onclick="hide('{{exercise}}')">Show/Hide</button> -->
+    <a style="display: inline;" class="btn btn-success btn-sm" onclick="addNewSet('{{exercise}}', '{{ data[exercise][0][0] }}', '{{ data[exercise][0][1] }}')">
         <span>Add a set</span>
     </a>
 </h2>
@@ -32,7 +32,7 @@
         }).then((_res) => {
             window.location.reload();
         });
-    
+
     }
     try {
         let canRedirect = false;
@@ -71,17 +71,15 @@
             canRedirect = true;
         });
     });
-    function addNewSet(exercise) {
-        if (!canRedirect) {
-            return null;
-        } else {
-            for (let [type, exercises] of Object.entries(workoutData)) {
+    function addNewSet(exercise, reps, weight) {
+        if (canRedirect) {
+            for (let [type, exercises] of Object.entries(workoutData['exercises'])) {
                 if (exercises.indexOf(exercise) != -1) {
                     let inputJSON = {
                         exerciseType: type,
                         exercise: exercise,
-                        reps: 0,
-                        weight: 0
+                        reps: reps,
+                        weight: weight
                     };
                     setCookie('previousSubmission', JSON.stringify(inputJSON));
                     window.location.href = "{{url_for('views.add_new_set')}}";
